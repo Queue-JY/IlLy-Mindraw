@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mindraw — 사고력 외주화 타파</title>
+  <title>Mindraw — 사고력 코치</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -42,7 +42,6 @@
       z-index: 0;
     }
 
-    /* ========== 공통 ========== */
     .screen {
       width: 100%;
       max-width: 720px;
@@ -51,19 +50,14 @@
       flex-direction: column;
       position: relative;
       z-index: 1;
-      transition: opacity 0.4s ease, transform 0.4s ease;
     }
 
-    .screen.hidden {
-      display: none;
-    }
+    .screen.hidden { display: none; }
 
-    /* ========== 온보딩 화면 ========== */
     #onboarding {
       align-items: center;
       justify-content: center;
       padding: 40px 32px;
-      gap: 0;
     }
 
     .onboard-logo {
@@ -112,7 +106,6 @@
       opacity: 0;
     }
 
-    /* 모드 카드들 */
     .mode-grid {
       display: flex;
       flex-direction: column;
@@ -146,19 +139,8 @@
       background: var(--accent-dim);
     }
 
-    .mode-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .mode-icon {
-      font-size: 18px;
-      width: 24px;
-      text-align: center;
-    }
-
-    .mode-info {}
+    .mode-left { display: flex; align-items: center; gap: 14px; }
+    .mode-icon { font-size: 18px; width: 24px; text-align: center; }
 
     .mode-name {
       font-size: 14px;
@@ -214,14 +196,8 @@
       opacity: 0;
     }
 
-    /* ========== 채팅 화면 ========== */
-    #chat {
-      display: none;
-    }
-
-    #chat.active {
-      display: flex;
-    }
+    #chat { display: none; }
+    #chat.active { display: flex; }
 
     .header {
       padding: 20px 32px 16px;
@@ -247,13 +223,7 @@
 
     .back-btn:hover { color: var(--accent); }
 
-    .header-divider {
-      width: 1px;
-      height: 14px;
-      background: var(--border);
-    }
-
-    .logo { display: flex; align-items: baseline; gap: 8px; }
+    .header-divider { width: 1px; height: 14px; background: var(--border); }
 
     .logo-text {
       font-size: 18px;
@@ -489,7 +459,7 @@
 </head>
 <body>
 
-  <!-- ===== 온보딩 화면 ===== -->
+  <!-- 온보딩 -->
   <div class="screen" id="onboarding">
     <div class="onboard-logo">MINDRAW</div>
 
@@ -506,7 +476,7 @@
     <div class="onboard-divider"></div>
 
     <div class="mode-grid">
-      <div class="mode-card selected" onclick="selectMode(this, 'writing')" data-mode="writing">
+      <div class="mode-card selected" onclick="selectMode(this, 'writing')">
         <div class="mode-left">
           <div class="mode-icon">✍️</div>
           <div class="mode-info">
@@ -517,7 +487,7 @@
         <div class="mode-arrow">→</div>
       </div>
 
-      <div class="mode-card" onclick="selectMode(this, 'decision')" data-mode="decision">
+      <div class="mode-card" onclick="selectMode(this, 'decision')">
         <div class="mode-left">
           <div class="mode-icon">⚖️</div>
           <div class="mode-info">
@@ -528,7 +498,7 @@
         <div class="mode-arrow">→</div>
       </div>
 
-      <div class="mode-card" onclick="selectMode(this, 'idea')" data-mode="idea">
+      <div class="mode-card" onclick="selectMode(this, 'idea')">
         <div class="mode-left">
           <div class="mode-icon">💡</div>
           <div class="mode-info">
@@ -544,16 +514,14 @@
     <div class="onboard-note">답을 드리지 않습니다. 생각할 준비가 되셨나요?</div>
   </div>
 
-  <!-- ===== 채팅 화면 ===== -->
+  <!-- 채팅 -->
   <div class="screen" id="chat">
     <div class="header">
       <div class="header-left">
         <button class="back-btn" onclick="goBack()">← 처음으로</button>
         <div class="header-divider"></div>
-        <div class="logo">
-          <span class="logo-text">Mindraw</span>
-        </div>
-        <div class="mode-badge" id="modeBadge">사고력 외주화</div>
+        <span class="logo-text">Mindraw</span>
+        <div class="mode-badge" id="modeBadge">글쓰기 코치</div>
       </div>
       <div class="session-info">
         <div>질문 <span class="turn-count" id="turnCount">0</span>회</div>
@@ -588,44 +556,36 @@
 <script>
   // =============================================
   // ⚠️ 여기에 OpenAI API 키 붙여넣기
-  // platform.openai.com → API Keys → Create
   // =============================================
-  const API_KEY = 'YOUR_OPENAI_API_KEY';
+  const API_KEY = 'sk-여기에키입력';
 
-  // ===== 모드 설정 =====
   const MODES = {
     writing: {
       name: '글쓰기 코치',
       greeting: '안녕하세요.\n저는 답을 드리지 않습니다.\n\n자소서, 보고서, 기획안 등\n쓰고 싶은 글의 주제나 고민을 말씀해주세요.',
       prompt: `당신은 소크라테스식 글쓰기 코치 'Mindraw'입니다.
-사용자가 글쓰기 관련 고민을 가져올 것입니다.
 핵심 원칙:
 1. 절대로 직접 글을 써주거나 예시 문장을 제공하지 마세요.
 2. 사용자의 생각과 경험을 끌어내는 질문 1개만 던지세요.
-3. "그 경험에서 가장 기억에 남는 순간은 무엇인가요?", "그때 당신이 느낀 감정을 한 단어로 표현한다면?" 같은 구체적 질문을 하세요.
-4. 존댓말, 따뜻하지만 날카로운 톤. 한국어. 3~4줄 이내.`
+3. 존댓말, 따뜻하지만 날카로운 톤. 한국어. 3~4줄 이내.`
     },
     decision: {
       name: '의사결정 코치',
       greeting: '안녕하세요.\n저는 답을 드리지 않습니다.\n\n지금 어떤 선택 앞에 서 계신가요?\n고민을 말씀해주세요.',
-      prompt: `당신은 소크라테스식 의사결정 코치 ‘Mindraw’입니다.
-사용자가 선택과 결정 관련 고민을 가져올 것입니다.
+      prompt: `당신은 소크라테스식 의사결정 코치 'Mindraw'입니다.
 핵심 원칙:
-1. 절대로 "A를 선택하세요" 같은 직접적인 답을 주지 마세요.
+1. 절대로 직접적인 답을 주지 마세요.
 2. 사용자 스스로 우선순위와 가치관을 발견하게 만드는 질문 1개만 던지세요.
-3. "1년 후의 나는 어떤 선택을 더 후회할 것 같나요?", "그 두 가지 중 하나를 잃는다면?" 같은 질문을 하세요.
-4. 존댓말, 따뜻하지만 날카로운 톤. 한국어. 3~4줄 이내.`
+3. 존댓말, 따뜻하지만 날카로운 톤. 한국어. 3~4줄 이내.`
     },
     idea: {
       name: '아이디에이션',
       greeting: '안녕하세요.\n저는 답을 드리지 않습니다.\n\n어떤 아이디어나 기획을 떠올리고 싶으신가요?\n주제나 맥락을 말씀해주세요.',
-      prompt: `당신은 소크라테스식 아이디에이션 코치 'Mindraw입니다.
-사용자가 창의적 발상이나 기획 관련 고민을 가져올 것입니다.
+      prompt: `당신은 소크라테스식 아이디에이션 코치 'Mindraw'입니다.
 핵심 원칙:
 1. 절대로 직접적인 아이디어를 제안하지 마세요.
 2. 사용자의 잠재적 생각을 끌어내는 질문 1개만 던지세요.
-3. "만약 예산과 기술 제약이 없다면 어떻게 하고 싶으세요?", "그 문제를 겪는 사람들이 가장 힘들어하는 순간은?" 같은 질문을 하세요.
-4. 존댓말, 따뜻하지만 날카로운 톤. 한국어. 3~4줄 이내.`
+3. 존댓말, 따뜻하지만 날카로운 톤. 한국어. 3~4줄 이내.`
     }
   };
 
@@ -635,45 +595,37 @@
   let isTimerRunning = false;
   let isLoading = false;
 
-  // ===== 모드 선택 =====
+  // 모드 선택
   function selectMode(el, mode) {
     document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
     selectedMode = mode;
   }
 
-  // ===== 채팅 시작 =====
+  // 채팅 시작 (핵심 함수 - 이전 코드에서 빠져있던 부분)
   function startChat() {
     const mode = MODES[selectedMode];
-
-    // 화면 전환
     document.getElementById('onboarding').classList.add('hidden');
     const chatEl = document.getElementById('chat');
     chatEl.classList.remove('hidden');
     chatEl.classList.add('active');
-
-    // 모드 배지 업데이트
     document.getElementById('modeBadge').textContent = mode.name;
-
-    // 채팅 초기화
     conversationHistory = [];
     turnCount = 0;
     document.getElementById('turnCount').textContent = 0;
     document.getElementById('chatBox').innerHTML = '';
-
-    // 첫 인사말
     addMessage(mode.greeting, 'ai');
     document.getElementById('userInput').focus();
   }
 
-  // ===== 처음으로 돌아가기 =====
+  // 처음으로
   function goBack() {
     document.getElementById('chat').classList.remove('active');
     document.getElementById('chat').classList.add('hidden');
     document.getElementById('onboarding').classList.remove('hidden');
   }
 
-  // ===== 메시지 전송 =====
+  // 메시지 전송
   async function sendMessage() {
     const input = document.getElementById('userInput');
     const text = input.value.trim();
@@ -732,7 +684,7 @@
     }
   }
 
-  // ===== 타이머 =====
+  // 타이머
   function startTimer() {
     const zone = document.getElementById('timerZone');
     const num = document.getElementById('timerNum');
@@ -764,7 +716,7 @@
     }, 1000);
   }
 
-  // ===== UI 헬퍼 =====
+  // UI 헬퍼
   function addMessage(text, role) {
     const chatBox = document.getElementById('chatBox');
     const wrap = document.createElement('div');
@@ -793,7 +745,7 @@
 
     const label = document.createElement('div');
     label.className = 'message-label';
-    label.textContent = ‘MINDRAW’;
+    label.textContent = 'MINDRAW';
 
     const loading = document.createElement('div');
     loading.className = 'loading';
