@@ -1,1 +1,836 @@
-.
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mindraw — 사고력 외주화 타파</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c0c0e;
+      --surface: #141416;
+      --border: #2a2a30;
+      --accent: #c8a96e;
+      --accent-dim: rgba(200, 169, 110, 0.12);
+      --accent-border: rgba(200, 169, 110, 0.25);
+      --text: #e8e6e0;
+      --text-dim: #6b6860;
+      --text-mid: #9e9b94;
+      --user-bg: #1a1f2e;
+      --user-border: #2a3555;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Noto Serif KR', serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(200,169,110,0.08) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ========== 공통 ========== */
+    .screen {
+      width: 100%;
+      max-width: 720px;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 1;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .screen.hidden {
+      display: none;
+    }
+
+    /* ========== 온보딩 화면 ========== */
+    #onboarding {
+      align-items: center;
+      justify-content: center;
+      padding: 40px 32px;
+      gap: 0;
+    }
+
+    .onboard-logo {
+      font-size: 13px;
+      font-family: 'DM Mono', monospace;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+      margin-bottom: 48px;
+      animation: fadeUp 0.6s ease forwards;
+      opacity: 0;
+    }
+
+    .onboard-headline {
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: -1px;
+      text-align: center;
+      margin-bottom: 20px;
+      animation: fadeUp 0.6s ease 0.1s forwards;
+      opacity: 0;
+    }
+
+    .onboard-headline em {
+      color: var(--accent);
+      font-style: normal;
+    }
+
+    .onboard-desc {
+      font-size: 15px;
+      color: var(--text-mid);
+      text-align: center;
+      line-height: 1.8;
+      max-width: 440px;
+      margin-bottom: 56px;
+      animation: fadeUp 0.6s ease 0.2s forwards;
+      opacity: 0;
+    }
+
+    .onboard-divider {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--border), transparent);
+      margin: 0 auto 56px;
+      animation: fadeUp 0.6s ease 0.25s forwards;
+      opacity: 0;
+    }
+
+    /* 모드 카드들 */
+    .mode-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 480px;
+      margin-bottom: 40px;
+      animation: fadeUp 0.6s ease 0.3s forwards;
+      opacity: 0;
+    }
+
+    .mode-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 18px 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: border-color 0.2s, background 0.2s;
+      border-radius: 2px;
+    }
+
+    .mode-card:hover {
+      border-color: var(--accent-border);
+      background: var(--accent-dim);
+    }
+
+    .mode-card.selected {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    .mode-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .mode-icon {
+      font-size: 18px;
+      width: 24px;
+      text-align: center;
+    }
+
+    .mode-info {}
+
+    .mode-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+
+    .mode-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .mode-arrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+      color: var(--text-dim);
+      transition: color 0.2s, transform 0.2s;
+    }
+
+    .mode-card:hover .mode-arrow,
+    .mode-card.selected .mode-arrow {
+      color: var(--accent);
+      transform: translateX(3px);
+    }
+
+    .start-btn {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 16px 48px;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: opacity 0.2s, transform 0.15s;
+      animation: fadeUp 0.6s ease 0.4s forwards;
+      opacity: 0;
+    }
+
+    .start-btn:hover { opacity: 0.85; }
+    .start-btn:active { transform: scale(0.97); }
+
+    .onboard-note {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-top: 16px;
+      text-align: center;
+      animation: fadeUp 0.6s ease 0.5s forwards;
+      opacity: 0;
+    }
+
+    /* ========== 채팅 화면 ========== */
+    #chat {
+      display: none;
+    }
+
+    #chat.active {
+      display: flex;
+    }
+
+    .header {
+      padding: 20px 32px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .header-left { display: flex; align-items: center; gap: 16px; }
+
+    .back-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--text-dim);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 0;
+      transition: color 0.2s;
+    }
+
+    .back-btn:hover { color: var(--accent); }
+
+    .header-divider {
+      width: 1px;
+      height: 14px;
+      background: var(--border);
+    }
+
+    .logo { display: flex; align-items: baseline; gap: 8px; }
+
+    .logo-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .mode-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 3px 8px;
+      border-radius: 2px;
+    }
+
+    .session-info {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--text-dim);
+      text-align: right;
+      line-height: 1.6;
+    }
+
+    .turn-count { color: var(--accent); }
+
+    .chat-box {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .chat-box::-webkit-scrollbar { width: 4px; }
+    .chat-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .message-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      animation: fadeUp 0.35s ease forwards;
+      opacity: 0;
+    }
+
+    .message-wrap.user { align-items: flex-end; }
+    .message-wrap.ai { align-items: flex-start; }
+
+    .message-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      padding: 0 4px;
+    }
+
+    .message {
+      max-width: 82%;
+      padding: 16px 20px;
+      border-radius: 2px;
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .message.ai {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+    }
+
+    .message.user {
+      background: var(--user-bg);
+      border: 1px solid var(--user-border);
+    }
+
+    .loading-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: flex-start;
+      animation: fadeUp 0.35s ease forwards;
+      opacity: 0;
+    }
+
+    .loading {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      padding: 16px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+    }
+
+    .dot {
+      width: 5px; height: 5px;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0.4;
+      animation: pulse 1.2s infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.2; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1); }
+    }
+
+    .timer-zone {
+      margin: 0 32px;
+      flex-shrink: 0;
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.4s ease, opacity 0.4s ease;
+      opacity: 0;
+    }
+
+    .timer-zone.active { max-height: 100px; opacity: 1; }
+
+    .timer-inner {
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .timer-text {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--accent);
+    }
+
+    .timer-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 26px;
+      font-weight: bold;
+      color: var(--accent);
+      min-width: 36px;
+      text-align: right;
+      transition: color 0.3s;
+    }
+
+    .timer-num.urgent { color: #e07070; }
+
+    .input-zone {
+      padding: 14px 32px 22px;
+      flex-shrink: 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .input-wrap { display: flex; gap: 10px; align-items: flex-end; }
+
+    textarea {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 14px 16px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: 'Noto Serif KR', serif;
+      line-height: 1.6;
+      resize: none;
+      min-height: 50px;
+      max-height: 120px;
+      border-radius: 2px;
+      transition: border-color 0.2s;
+    }
+
+    textarea::placeholder { color: var(--text-dim); }
+    textarea:focus { outline: none; border-color: rgba(200,169,110,0.5); }
+    textarea:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .send-btn {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 14px 20px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: opacity 0.2s, transform 0.1s;
+      white-space: nowrap;
+      height: 50px;
+    }
+
+    .send-btn:hover:not(:disabled) { opacity: 0.85; }
+    .send-btn:active:not(:disabled) { transform: scale(0.97); }
+    .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .hint {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-top: 8px;
+      text-align: right;
+    }
+
+    .error-msg {
+      background: rgba(200,80,80,0.1);
+      border: 1px solid rgba(200,80,80,0.3);
+      border-left: 3px solid #c85050;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #e08080;
+      border-radius: 2px;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 640px) {
+      #onboarding { padding: 32px 20px; }
+      .onboard-headline { font-size: 26px; }
+      .header { padding: 14px 20px; }
+      .chat-box { padding: 20px; }
+      .timer-zone { margin: 0 20px; }
+      .input-zone { padding: 12px 20px 20px; }
+      .message { max-width: 92%; font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== 온보딩 화면 ===== -->
+  <div class="screen" id="onboarding">
+    <div class="onboard-logo">MINDRAW</div>
+
+    <h1 class="onboard-headline">
+      답이 아닌 <em>질문</em>을<br>드립니다
+    </h1>
+
+    <p class="onboard-desc">
+      AI가 답을 주는 시대,<br>
+      Mindraw는 당신이 스스로 생각하도록<br>
+      질문을 던집니다.
+    </p>
+
+    <div class="onboard-divider"></div>
+
+    <div class="mode-grid">
+      <div class="mode-card selected" onclick="selectMode(this, 'writing')" data-mode="writing">
+        <div class="mode-left">
+          <div class="mode-icon">✍️</div>
+          <div class="mode-info">
+            <div class="mode-name">글쓰기 코치</div>
+            <div class="mode-sub">자소서 · 보고서 · 기획안</div>
+          </div>
+        </div>
+        <div class="mode-arrow">→</div>
+      </div>
+
+      <div class="mode-card" onclick="selectMode(this, 'decision')" data-mode="decision">
+        <div class="mode-left">
+          <div class="mode-icon">⚖️</div>
+          <div class="mode-info">
+            <div class="mode-name">의사결정 코치</div>
+            <div class="mode-sub">선택 · 판단 · 방향 설정</div>
+          </div>
+        </div>
+        <div class="mode-arrow">→</div>
+      </div>
+
+      <div class="mode-card" onclick="selectMode(this, 'idea')" data-mode="idea">
+        <div class="mode-left">
+          <div class="mode-icon">💡</div>
+          <div class="mode-info">
+            <div class="mode-name">아이디에이션</div>
+            <div class="mode-sub">발상 · 기획 · 창의적 사고</div>
+          </div>
+        </div>
+        <div class="mode-arrow">→</div>
+      </div>
+    </div>
+
+    <button class="start-btn" onclick="startChat()">시작하기</button>
+    <div class="onboard-note">답을 드리지 않습니다. 생각할 준비가 되셨나요?</div>
+  </div>
+
+  <!-- ===== 채팅 화면 ===== -->
+  <div class="screen" id="chat">
+    <div class="header">
+      <div class="header-left">
+        <button class="back-btn" onclick="goBack()">← 처음으로</button>
+        <div class="header-divider"></div>
+        <div class="logo">
+          <span class="logo-text">Mindrow</span>
+        </div>
+        <div class="mode-badge" id="modeBadge">사고력 외주화</div>
+      </div>
+      <div class="session-info">
+        <div>질문 <span class="turn-count" id="turnCount">0</span>회</div>
+        <div>내 생각으로 채운 대화</div>
+      </div>
+    </div>
+
+    <div class="chat-box" id="chatBox"></div>
+
+    <div class="timer-zone" id="timerZone">
+      <div class="timer-inner">
+        <div class="timer-text">⏱ 잠깐, 혼자 먼저 생각해보세요</div>
+        <div class="timer-num" id="timerNum">30</div>
+      </div>
+    </div>
+
+    <div class="input-zone">
+      <div class="input-wrap">
+        <textarea
+          id="userInput"
+          placeholder="고민이나 질문을 입력하세요..."
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this)"
+          rows="1"
+        ></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">전송</button>
+      </div>
+      <div class="hint">Enter로 전송 · Shift+Enter 줄바꿈</div>
+    </div>
+  </div>
+
+<script>
+  // =============================================
+  // ⚠️ 여기에 OpenAI API 키 붙여넣기
+  // platform.openai.com → API Keys → Create
+  // =============================================
+  const API_KEY = 'YOUR_OPENAI_API_KEY';
+
+  // ===== 모드 설정 =====
+  const MODES = {
+    writing: {
+      name: '글쓰기 코치',
+      greeting: '안녕하세요.\n저는 답을 드리지 않습니다.\n\n자소서, 보고서, 기획안 등\n쓰고 싶은 글의 주제나 고민을 말씀해주세요.',
+      prompt: `당신은 소크라테스식 글쓰기 코치 'Mindraw'입니다.
+사용자가 글쓰기 관련 고민을 가져올 것입니다.
+핵심 원칙:
+1. 절대로 직접 글을 써주거나 예시 문장을 제공하지 마세요.
+2. 사용자의 생각과 경험을 끌어내는 질문 1개만 던지세요.
+3. "그 경험에서 가장 기억에 남는 순간은 무엇인가요?", "그때 당신이 느낀 감정을 한 단어로 표현한다면?" 같은 구체적 질문을 하세요.
+4. 존댓말, 따뜻하지만 날카로운 톤. 한국어. 3~4줄 이내.`
+    },
+    decision: {
+      name: '의사결정 코치',
+      greeting: '안녕하세요.\n저는 답을 드리지 않습니다.\n\n지금 어떤 선택 앞에 서 계신가요?\n고민을 말씀해주세요.',
+      prompt: `당신은 소크라테스식 의사결정 코치 ‘Mindraw’입니다.
+사용자가 선택과 결정 관련 고민을 가져올 것입니다.
+핵심 원칙:
+1. 절대로 "A를 선택하세요" 같은 직접적인 답을 주지 마세요.
+2. 사용자 스스로 우선순위와 가치관을 발견하게 만드는 질문 1개만 던지세요.
+3. "1년 후의 나는 어떤 선택을 더 후회할 것 같나요?", "그 두 가지 중 하나를 잃는다면?" 같은 질문을 하세요.
+4. 존댓말, 따뜻하지만 날카로운 톤. 한국어. 3~4줄 이내.`
+    },
+    idea: {
+      name: '아이디에이션',
+      greeting: '안녕하세요.\n저는 답을 드리지 않습니다.\n\n어떤 아이디어나 기획을 떠올리고 싶으신가요?\n주제나 맥락을 말씀해주세요.',
+      prompt: `당신은 소크라테스식 아이디에이션 코치 'Mindraw입니다.
+사용자가 창의적 발상이나 기획 관련 고민을 가져올 것입니다.
+핵심 원칙:
+1. 절대로 직접적인 아이디어를 제안하지 마세요.
+2. 사용자의 잠재적 생각을 끌어내는 질문 1개만 던지세요.
+3. "만약 예산과 기술 제약이 없다면 어떻게 하고 싶으세요?", "그 문제를 겪는 사람들이 가장 힘들어하는 순간은?" 같은 질문을 하세요.
+4. 존댓말, 따뜻하지만 날카로운 톤. 한국어. 3~4줄 이내.`
+    }
+  };
+
+  let selectedMode = 'writing';
+  let conversationHistory = [];
+  let turnCount = 0;
+  let isTimerRunning = false;
+  let isLoading = false;
+
+  // ===== 모드 선택 =====
+  function selectMode(el, mode) {
+    document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedMode = mode;
+  }
+
+  // ===== 채팅 시작 =====
+  function startChat() {
+    const mode = MODES[selectedMode];
+
+    // 화면 전환
+    document.getElementById('onboarding').classList.add('hidden');
+    const chatEl = document.getElementById('chat');
+    chatEl.classList.remove('hidden');
+    chatEl.classList.add('active');
+
+    // 모드 배지 업데이트
+    document.getElementById('modeBadge').textContent = mode.name;
+
+    // 채팅 초기화
+    conversationHistory = [];
+    turnCount = 0;
+    document.getElementById('turnCount').textContent = 0;
+    document.getElementById('chatBox').innerHTML = '';
+
+    // 첫 인사말
+    addMessage(mode.greeting, 'ai');
+    document.getElementById('userInput').focus();
+  }
+
+  // ===== 처음으로 돌아가기 =====
+  function goBack() {
+    document.getElementById('chat').classList.remove('active');
+    document.getElementById('chat').classList.add('hidden');
+    document.getElementById('onboarding').classList.remove('hidden');
+  }
+
+  // ===== 메시지 전송 =====
+  async function sendMessage() {
+    const input = document.getElementById('userInput');
+    const text = input.value.trim();
+    if (!text || isLoading || isTimerRunning) return;
+
+    input.value = '';
+    autoResize(input);
+    isLoading = true;
+    document.getElementById('sendBtn').disabled = true;
+
+    turnCount++;
+    document.getElementById('turnCount').textContent = turnCount;
+    addMessage(text, 'user');
+    conversationHistory.push({ role: 'user', content: text });
+
+    const loadingEl = addLoading();
+
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          max_tokens: 300,
+          messages: [
+            { role: 'system', content: MODES[selectedMode].prompt },
+            ...conversationHistory
+          ]
+        })
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error?.message || '응답 오류');
+      }
+
+      const data = await response.json();
+      const aiText = data.choices[0].message.content;
+
+      conversationHistory.push({ role: 'assistant', content: aiText });
+      loadingEl.remove();
+      addMessage(aiText, 'ai');
+      startTimer();
+
+    } catch (err) {
+      loadingEl.remove();
+      addError(err.message);
+    }
+
+    isLoading = false;
+    if (!isTimerRunning) {
+      document.getElementById('sendBtn').disabled = false;
+    }
+  }
+
+  // ===== 타이머 =====
+  function startTimer() {
+    const zone = document.getElementById('timerZone');
+    const num = document.getElementById('timerNum');
+    const input = document.getElementById('userInput');
+    const btn = document.getElementById('sendBtn');
+
+    isTimerRunning = true;
+    input.disabled = true;
+    btn.disabled = true;
+    zone.classList.add('active');
+
+    let count = 30;
+    num.textContent = count;
+    num.classList.remove('urgent');
+
+    const interval = setInterval(() => {
+      count--;
+      num.textContent = count;
+      if (count <= 10) num.classList.add('urgent');
+      if (count <= 0) {
+        clearInterval(interval);
+        isTimerRunning = false;
+        input.disabled = false;
+        btn.disabled = false;
+        zone.classList.remove('active');
+        num.classList.remove('urgent');
+        input.focus();
+      }
+    }, 1000);
+  }
+
+  // ===== UI 헬퍼 =====
+  function addMessage(text, role) {
+    const chatBox = document.getElementById('chatBox');
+    const wrap = document.createElement('div');
+    wrap.className = `message-wrap ${role}`;
+
+    const label = document.createElement('div');
+    label.className = 'message-label';
+    label.textContent = role === 'ai' ? 'MINDRAW' : 'YOU';
+
+    const msg = document.createElement('div');
+    msg.className = `message ${role}`;
+    msg.style.whiteSpace = 'pre-line';
+    msg.textContent = text;
+
+    wrap.appendChild(label);
+    wrap.appendChild(msg);
+    chatBox.appendChild(wrap);
+    scrollBottom();
+    return wrap;
+  }
+
+  function addLoading() {
+    const chatBox = document.getElementById('chatBox');
+    const wrap = document.createElement('div');
+    wrap.className = 'loading-wrap';
+
+    const label = document.createElement('div');
+    label.className = 'message-label';
+    label.textContent = ‘MINDRAW’;
+
+    const loading = document.createElement('div');
+    loading.className = 'loading';
+    loading.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+
+    wrap.appendChild(label);
+    wrap.appendChild(loading);
+    chatBox.appendChild(wrap);
+    scrollBottom();
+    return wrap;
+  }
+
+  function addError(msg) {
+    const chatBox = document.getElementById('chatBox');
+    const el = document.createElement('div');
+    el.className = 'error-msg';
+    el.textContent = `오류: ${msg} — API 키를 확인해주세요.`;
+    chatBox.appendChild(el);
+    scrollBottom();
+  }
+
+  function scrollBottom() {
+    const chatBox = document.getElementById('chatBox');
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+</script>
+</body>
+</html>
