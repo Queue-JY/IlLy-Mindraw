@@ -41,7 +41,7 @@ export default function Home() {
   const inputRef = useRef(null);
   const timerRef = useRef(null);
 
-  // 새 메시지 올 때 자동 스크롤
+  // 새 메시지 올 때마다 최하단으로 자동 스크롤
   useEffect(() => {
     if (chatBoxRef.current) {
       chatBoxRef.current.scrollTo({
@@ -72,6 +72,7 @@ export default function Home() {
     setTimerCount(30);
     setIsUrgent(false);
     let count = 30;
+
     timerRef.current = setInterval(() => {
       count--;
       setTimerCount(count);
@@ -171,13 +172,14 @@ export default function Home() {
           overflow: hidden;
         }
 
-        /* ==================== 온보딩 ==================== */
+        /* 온보딩 */
         .onboarding {
           flex: 1;
-          overflow-y: auto;
-          padding: 40px 32px;
           display: flex;
           flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 40px 32px;
         }
 
         .onboard-logo { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--accent); letter-spacing: 0.2em; margin-bottom: 48px; }
@@ -187,8 +189,43 @@ export default function Home() {
         .onboard-divider { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--border), transparent); margin: 0 auto 56px; }
 
         .mode-grid { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 480px; margin-bottom: 40px; }
+        .mode-card {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          padding: 18px 22px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          transition: border-color 0.2s, background 0.2s;
+          border-radius: 2px;
+        }
+        .mode-card:hover { border-color: var(--accent-border); background: var(--accent-dim); }
+        .mode-card.selected { border-color: var(--accent); background: var(--accent-dim); }
 
-        /* ==================== 채팅 ==================== */
+        .mode-left { display: flex; align-items: center; gap: 14px; }
+        .mode-icon { font-size: 18px; width: 24px; text-align: center; }
+        .mode-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+        .mode-sub { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-dim); }
+        .mode-arrow { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--text-dim); transition: color 0.2s, transform 0.2s; }
+        .mode-card:hover .mode-arrow, .mode-card.selected .mode-arrow { color: var(--accent); transform: translateX(3px); }
+
+        .start-btn {
+          background: var(--accent);
+          color: var(--bg);
+          border: none;
+          padding: 16px 48px;
+          font-family: 'DM Mono', monospace;
+          font-size: 13px;
+          letter-spacing: 0.1em;
+          cursor: pointer;
+          border-radius: 2px;
+          transition: opacity 0.2s;
+        }
+        .start-btn:hover { opacity: 0.85; }
+        .onboard-note { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-dim); margin-top: 16px; }
+
+        /* 채팅 화면 */
         .chat-screen {
           flex: 1;
           display: flex;
@@ -214,22 +251,13 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           gap: 20px;
-          scroll-behavior: smooth;
+          justify-content: flex-end;        /* 최신 메시지 하단 고정 */
           -webkit-overflow-scrolling: touch;
+          scroll-behavior: smooth;
+          overscroll-behavior: contain;
         }
 
-        .chat-box::-webkit-scrollbar {
-          width: 4px;
-        }
-        .chat-box::-webkit-scrollbar-thumb {
-          background: var(--accent-border);
-          border-radius: 2px;
-        }
-
-        .chat-spacer {
-          flex: 1;
-          min-height: 60px;
-        }
+        .chat-box::-webkit-scrollbar { display: none; }
 
         .message-wrap { display: flex; flex-direction: column; gap: 6px; }
         .message-wrap.user { align-items: flex-end; }
@@ -248,9 +276,9 @@ export default function Home() {
 
         .message.ai { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); }
         .message.user { background: var(--user-bg); border: 1px solid var(--user-border); }
+        .message.error { background: rgba(200,80,80,0.1); border: 1px solid rgba(200,80,80,0.3); border-left: 3px solid #c85050; color: #e08080; font-size: 13px; }
 
         .loading-dots { display: flex; gap: 5px; align-items: center; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 2px; }
-
         .dot { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; opacity: 0.4; animation: pulse 1.2s infinite; }
         .dot:nth-child(2) { animation-delay: 0.2s; }
         .dot:nth-child(3) { animation-delay: 0.4s; }
@@ -316,9 +344,18 @@ export default function Home() {
 
         .hint { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-dim); margin-top: 8px; text-align: right; }
 
-        /* 모바일 */
+        /* 모바일 최적화 */
         @media (max-width: 640px) {
-          .onboarding { padding: 40px 20px 32px; }
+          .onboarding { justify-content: flex-start; padding: 48px 20px 32px; gap: 20px; }
+          .onboard-logo { margin-bottom: 20px; font-size: 12px; }
+          .onboard-headline { margin-bottom: 12px; line-height: 1.25; }
+          .onboard-desc { margin-bottom: 24px; font-size: 14.5px; line-height: 1.65; }
+          .onboard-divider { height: 28px; margin: 0 auto 28px; }
+          .mode-grid { gap: 8px; margin-bottom: 28px; }
+          .mode-card { padding: 16px 20px; }
+          .start-btn { padding: 15px 56px; font-size: 13.5px; margin-top: 8px; }
+          .onboard-note { margin-top: 8px; font-size: 9.5px; }
+
           .header { padding: 14px 20px; }
           .chat-box { padding: 20px 20px 24px; }
           .timer-zone { margin: 0 20px; }
@@ -331,7 +368,9 @@ export default function Home() {
         {screen === 'onboarding' && (
           <div className="onboarding">
             <div className="onboard-logo">MINDRAW</div>
-            <h1 className="onboard-headline">답이 아닌 <em>질문</em>을<br />드립니다</h1>
+            <h1 className="onboard-headline">
+              답이 아닌 <em>질문</em>을<br />드립니다
+            </h1>
             <p className="onboard-desc">
               AI가 답을 주는 시대,<br />
               Mindraw는 당신이 스스로 생각하도록<br />
@@ -379,9 +418,6 @@ export default function Home() {
             </div>
 
             <div className="chat-box" ref={chatBoxRef}>
-              {/* 빈 공간 - 초기에는 메시지를 아래로 밀어줌 */}
-              <div className="chat-spacer"></div>
-
               {messages.map((msg, i) => (
                 <div key={i} className={`message-wrap ${msg.role}`}>
                   <div className="message-label">
@@ -390,7 +426,6 @@ export default function Home() {
                   <div className={`message ${msg.role}`}>{msg.text}</div>
                 </div>
               ))}
-
               {isLoading && (
                 <div className="message-wrap ai">
                   <div className="message-label">MINDRAW</div>
@@ -424,7 +459,11 @@ export default function Home() {
                     e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
                   }}
                 />
-                <button className="send-btn" onClick={sendMessage} disabled={isLoading || timerActive}>
+                <button
+                  className="send-btn"
+                  onClick={sendMessage}
+                  disabled={isLoading || timerActive}
+                >
                   전송
                 </button>
               </div>
