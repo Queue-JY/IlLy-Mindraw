@@ -41,11 +41,15 @@ export default function Home() {
   const inputRef = useRef(null);
   const timerRef = useRef(null);
 
+  // 새 메시지 올 때마다 최하단으로 자동 스크롤
   useEffect(() => {
     if (chatBoxRef.current) {
-      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+      chatBoxRef.current.scrollTo({
+        top: chatBoxRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
     }
-  }, [messages, isLoading]);
+  }, [messages]);
 
   const startChat = () => {
     const mode = MODES[selectedMode];
@@ -115,6 +119,7 @@ export default function Home() {
     } catch (err) {
       setMessages(prev => [...prev, { role: 'error', text: `오류: ${err.message}` }]);
     }
+
     setIsLoading(false);
   };
 
@@ -164,27 +169,26 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           position: relative;
+          overflow: hidden;
         }
 
-        /* 온보딩 수정: 스크롤 가능하게 */
+        /* 온보딩 */
         .onboarding {
           flex: 1;
           display: flex;
           flex-direction: column;
           align-items: center;
-          padding: 60px 32px;
-          overflow-y: auto;
-          scrollbar-width: none; /* Firefox */
+          justify-content: center;
+          padding: 40px 32px;
         }
-        .onboarding::-webkit-scrollbar { display: none; }
 
-        .onboard-logo { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--accent); letter-spacing: 0.2em; margin-bottom: 40px; flex-shrink: 0; }
-        .onboard-headline { font-size: clamp(28px, 5vw, 42px); font-weight: 700; line-height: 1.3; letter-spacing: -1px; text-align: center; margin-bottom: 20px; flex-shrink: 0; }
+        .onboard-logo { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--accent); letter-spacing: 0.2em; margin-bottom: 48px; }
+        .onboard-headline { font-size: clamp(28px, 5vw, 42px); font-weight: 700; line-height: 1.3; letter-spacing: -1px; text-align: center; margin-bottom: 20px; }
         .onboard-headline em { color: var(--accent); font-style: normal; }
-        .onboard-desc { font-size: 15px; color: var(--text-mid); text-align: center; line-height: 1.8; max-width: 440px; margin-bottom: 40px; flex-shrink: 0; }
-        .onboard-divider { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--border), transparent); margin-bottom: 40px; flex-shrink: 0; }
+        .onboard-desc { font-size: 15px; color: var(--text-mid); text-align: center; line-height: 1.8; max-width: 440px; margin-bottom: 56px; }
+        .onboard-divider { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--border), transparent); margin: 0 auto 56px; }
 
-        .mode-grid { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 480px; margin-bottom: 40px; flex-shrink: 0; }
+        .mode-grid { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 480px; margin-bottom: 40px; }
         .mode-card {
           background: var(--surface);
           border: 1px solid var(--border);
@@ -210,121 +214,153 @@ export default function Home() {
           background: var(--accent);
           color: var(--bg);
           border: none;
-          padding: 16px 64px;
+          padding: 16px 48px;
           font-family: 'DM Mono', monospace;
           font-size: 13px;
           letter-spacing: 0.1em;
           cursor: pointer;
           border-radius: 2px;
           transition: opacity 0.2s;
-          flex-shrink: 0;
-          margin-bottom: 16px;
         }
         .start-btn:hover { opacity: 0.85; }
-        .onboard-note { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-dim); margin-bottom: 40px; flex-shrink: 0; }
+        .onboard-note { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-dim); margin-top: 16px; }
 
-        /* 채팅 화면 수정: 스크롤 및 배치 최적화 */
+        /* 채팅 화면 */
         .chat-screen {
           flex: 1;
           display: flex;
           flex-direction: column;
           overflow: hidden;
+          min-height: 0;
         }
 
         .header {
-          padding: 16px 24px;
+          padding: 20px 32px 16px;
           border-bottom: 1px solid var(--border);
           display: flex;
           align-items: center;
           justify-content: space-between;
-          background: var(--bg);
-          z-index: 10;
+          flex-shrink: 0;
         }
-        .back-btn { background: none; border: none; color: var(--text-dim); font-size: 12px; cursor: pointer; font-family: 'Noto Serif KR'; }
-        .back-btn:hover { color: var(--text); }
-        .header-center { display: flex; align-items: center; gap: 10px; }
-        .mode-badge { font-size: 11px; color: var(--accent); border: 1px solid var(--accent-border); padding: 2px 8px; border-radius: 10px; }
 
         .chat-box {
-          flex: 1;
+          flex: 1 1 auto;
           overflow-y: auto;
-          padding: 24px;
+          overflow-x: hidden;
+          padding: 24px 32px;
           display: flex;
           flex-direction: column;
-          gap: 24px;
+          gap: 20px;
+          justify-content: flex-end;        /* 최신 메시지 하단 고정 */
+          -webkit-overflow-scrolling: touch;
+          scroll-behavior: smooth;
+          overscroll-behavior: contain;
         }
-        
-        /* 메시지가 적을 때 아래에 붙게 만드는 공간 */
-        .chat-spacer { flex: 1 1 auto; }
 
-        /* 스크롤바 디자인 */
-        .chat-box::-webkit-scrollbar { width: 4px; }
-        .chat-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        .chat-box::-webkit-scrollbar { display: none; }
 
-        .message-wrap { display: flex; flex-direction: column; gap: 8px; max-width: 85%; }
-        .message-wrap.user { align-self: flex-end; align-items: flex-end; }
-        .message-wrap.ai { align-self: flex-start; align-items: flex-start; }
+        .message-wrap { display: flex; flex-direction: column; gap: 6px; }
+        .message-wrap.user { align-items: flex-end; }
+        .message-wrap.ai { align-items: flex-start; }
 
-        .message-label { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 0.1em; }
+        .message-label { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 0.1em; padding: 0 4px; }
+
         .message {
-          padding: 14px 18px;
+          max-width: 82%;
+          padding: 16px 20px;
           border-radius: 2px;
           font-size: 15px;
-          line-height: 1.7;
+          line-height: 1.75;
           white-space: pre-line;
-          word-break: break-all;
         }
+
         .message.ai { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); }
         .message.user { background: var(--user-bg); border: 1px solid var(--user-border); }
+        .message.error { background: rgba(200,80,80,0.1); border: 1px solid rgba(200,80,80,0.3); border-left: 3px solid #c85050; color: #e08080; font-size: 13px; }
 
-        .timer-zone { padding: 0 24px; overflow: hidden; max-height: 0; transition: all 0.3s ease; opacity: 0; }
-        .timer-zone.active { max-height: 80px; opacity: 1; margin-bottom: 12px; }
+        .loading-dots { display: flex; gap: 5px; align-items: center; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 2px; }
+        .dot { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; opacity: 0.4; animation: pulse 1.2s infinite; }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes pulse { 0%, 100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1); } }
+
+        .timer-zone { margin: 0 32px; flex-shrink: 0; overflow: hidden; max-height: 0; transition: max-height 0.4s ease, opacity 0.4s ease; opacity: 0; }
+        .timer-zone.active { max-height: 100px; opacity: 1; }
+
         .timer-inner {
           background: var(--accent-dim);
           border: 1px solid var(--accent-border);
-          padding: 10px 16px;
+          padding: 12px 20px;
           display: flex;
           align-items: center;
           justify-content: space-between;
+          margin-bottom: 12px;
         }
-        .timer-text { font-size: 11px; color: var(--accent); }
-        .timer-num { font-family: 'DM Mono', monospace; font-size: 20px; font-weight: bold; color: var(--accent); }
+
+        .timer-text { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent); }
+        .timer-num { font-family: 'DM Mono', monospace; font-size: 26px; font-weight: bold; color: var(--accent); transition: color 0.3s; }
         .timer-num.urgent { color: #e07070; }
 
-        .input-zone { padding: 16px 24px 24px; border-top: 1px solid var(--border); background: var(--bg); }
+        .input-zone { padding: 14px 32px 22px; flex-shrink: 0; border-top: 1px solid var(--border); }
         .input-wrap { display: flex; gap: 10px; align-items: flex-end; }
+
         textarea {
           flex: 1;
           background: var(--surface);
           border: 1px solid var(--border);
-          padding: 14px;
+          padding: 14px 16px;
           color: var(--text);
           font-size: 14px;
-          font-family: inherit;
+          font-family: 'Noto Serif KR', serif;
+          line-height: 1.6;
           resize: none;
-          min-height: 48px;
+          min-height: 50px;
           max-height: 120px;
           border-radius: 2px;
+          transition: border-color 0.2s;
         }
-        textarea:focus { outline: none; border-color: var(--accent-border); }
+
+        textarea::placeholder { color: var(--text-dim); }
+        textarea:focus { outline: none; border-color: rgba(200,169,110,0.5); }
+        textarea:disabled { opacity: 0.4; cursor: not-allowed; }
+
         .send-btn {
           background: var(--accent);
           color: var(--bg);
           border: none;
-          height: 48px;
-          padding: 0 20px;
+          padding: 14px 20px;
           font-family: 'DM Mono', monospace;
           font-size: 12px;
+          letter-spacing: 0.08em;
           cursor: pointer;
           border-radius: 2px;
+          transition: opacity 0.2s;
+          white-space: nowrap;
+          height: 50px;
         }
+        .send-btn:hover:not(:disabled) { opacity: 0.85; }
         .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
+        .hint { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-dim); margin-top: 8px; text-align: right; }
+
+        /* 모바일 최적화 */
         @media (max-width: 640px) {
-          .onboarding { padding: 40px 24px; }
-          .header { padding: 12px 16px; }
-          .chat-box { padding: 16px; }
-          .input-zone { padding: 12px 16px 20px; }
+          .onboarding { justify-content: flex-start; padding: 48px 20px 32px; gap: 20px; }
+          .onboard-logo { margin-bottom: 20px; font-size: 12px; }
+          .onboard-headline { margin-bottom: 12px; line-height: 1.25; }
+          .onboard-desc { margin-bottom: 24px; font-size: 14.5px; line-height: 1.65; }
+          .onboard-divider { height: 28px; margin: 0 auto 28px; }
+          .mode-grid { gap: 8px; margin-bottom: 28px; }
+          .mode-card { padding: 16px 20px; }
+          .start-btn { padding: 15px 56px; font-size: 13.5px; margin-top: 8px; }
+          .onboard-note { margin-top: 8px; font-size: 9.5px; }
+
+          .header { padding: 14px 20px; }
+          .chat-box { padding: 20px 20px 24px; }
+          .timer-zone { margin: 0 20px; }
+          .input-zone { padding: 12px 20px 20px; }
+          .message { max-width: 92%; font-size: 14px; }
         }
       `}</style>
 
@@ -369,33 +405,40 @@ export default function Home() {
         {screen === 'chat' && (
           <div className="chat-screen">
             <div className="header">
-              <button className="back-btn" onClick={goBack}>← 처음으로</button>
-              <div className="header-center">
-                <span style={{ fontFamily: 'DM Mono', fontSize: '12px', letterSpacing: '0.1em' }}>MINDRAW</span>
+              <div className="header-left">
+                <button className="back-btn" onClick={goBack}>← 처음으로</button>
+                <div className="header-divider" />
+                <span className="logo-text">Mindraw</span>
                 <div className="mode-badge">{MODES[selectedMode].name}</div>
               </div>
-              <div style={{ fontSize: '11px', color: 'var(--text-dim)' }}>Q: {turnCount}</div>
+              <div className="session-info">
+                <div>질문 <span className="turn-count">{turnCount}</span>회</div>
+                <div>내 생각으로 채운 대화</div>
+              </div>
             </div>
 
             <div className="chat-box" ref={chatBoxRef}>
-              <div className="chat-spacer" />
               {messages.map((msg, i) => (
                 <div key={i} className={`message-wrap ${msg.role}`}>
-                  <div className="message-label">{msg.role === 'ai' ? 'MINDRAW' : 'YOU'}</div>
+                  <div className="message-label">
+                    {msg.role === 'ai' ? 'MINDRAW' : msg.role === 'user' ? 'YOU' : ''}
+                  </div>
                   <div className={`message ${msg.role}`}>{msg.text}</div>
                 </div>
               ))}
               {isLoading && (
                 <div className="message-wrap ai">
                   <div className="message-label">MINDRAW</div>
-                  <div className="message ai" style={{ opacity: 0.5 }}>생각하는 중...</div>
+                  <div className="loading-dots">
+                    <div className="dot" /><div className="dot" /><div className="dot" />
+                  </div>
                 </div>
               )}
             </div>
 
             <div className={`timer-zone ${timerActive ? 'active' : ''}`}>
               <div className="timer-inner">
-                <div className="timer-text">잠시 멈추고 스스로의 답을 정리해보세요</div>
+                <div className="timer-text">⏱ 잠깐, 혼자 먼저 생각해보세요</div>
                 <div className={`timer-num ${isUrgent ? 'urgent' : ''}`}>{timerCount}</div>
               </div>
             </div>
@@ -407,9 +450,10 @@ export default function Home() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKey}
-                  placeholder={timerActive ? "스스로 생각할 시간입니다..." : "내용을 입력하세요..."}
+                  placeholder="고민이나 질문을 입력하세요..."
                   disabled={isLoading || timerActive}
                   rows={1}
+                  style={{ height: 'auto' }}
                   onInput={(e) => {
                     e.target.style.height = 'auto';
                     e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
@@ -418,11 +462,12 @@ export default function Home() {
                 <button
                   className="send-btn"
                   onClick={sendMessage}
-                  disabled={isLoading || timerActive || !input.trim()}
+                  disabled={isLoading || timerActive}
                 >
                   전송
                 </button>
               </div>
+              <div className="hint">Enter로 전송 · Shift+Enter 줄바꿈</div>
             </div>
           </div>
         )}
