@@ -97,7 +97,11 @@ export default function Home() {
     setIsLoading(true);
     setTurnCount(prev => prev + 1);
 
+<<<<<<< HEAD
     const newHistory = [...conversationHistory, { role: 'user', content: text }];
+=======
+    const newHistory = [...conversationHistory, { role: 'user', parts: [{ text }] }];
+>>>>>>> d8f6ce3 (모바일 페이지 버튼 가시적으로 수정)
     setConversationHistory(newHistory);
     setMessages(prev => [...prev, { role: 'user', text }]);
 
@@ -179,12 +183,17 @@ export default function Home() {
           overflow: hidden;
         }
 
+<<<<<<< HEAD
         /* ── 온보딩: overflow-y scroll로 버튼 항상 접근 가능 ── */
+=======
+        /* 온보딩: overflow-y auto로 스크롤 가능 → 시작하기 버튼 항상 접근 가능 */
+>>>>>>> d8f6ce3 (모바일 페이지 버튼 가시적으로 수정)
         .onboarding {
           flex: 1;
           overflow-y: auto;
           overflow-x: hidden;
           -webkit-overflow-scrolling: touch;
+<<<<<<< HEAD
           padding: 48px 32px 40px;
           display: flex;
           flex-direction: column;
@@ -209,8 +218,22 @@ export default function Home() {
           text-align: center;
           margin-bottom: 18px;
         }
-        .onboard-headline em { color: var(--accent); font-style: normal; }
+=======
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 48px 32px 40px;
+        }
+        .onboarding::-webkit-scrollbar { display: none; }
 
+        .onboard-logo { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--accent); letter-spacing: 0.2em; margin-bottom: 48px; flex-shrink: 0; }
+        .onboard-headline { font-size: clamp(28px, 5vw, 42px); font-weight: 700; line-height: 1.3; letter-spacing: -1px; text-align: center; margin-bottom: 20px; }
+>>>>>>> d8f6ce3 (모바일 페이지 버튼 가시적으로 수정)
+        .onboard-headline em { color: var(--accent); font-style: normal; }
+        .onboard-desc { font-size: 15px; color: var(--text-mid); text-align: center; line-height: 1.8; max-width: 440px; margin-bottom: 56px; }
+        .onboard-divider { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--border), transparent); margin: 0 auto 56px; flex-shrink: 0; }
+
+<<<<<<< HEAD
         .onboard-desc {
           font-size: 15px;
           color: var(--text-mid);
@@ -237,6 +260,9 @@ export default function Home() {
           margin-bottom: 36px;
         }
 
+=======
+        .mode-grid { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 480px; margin-bottom: 40px; }
+>>>>>>> d8f6ce3 (모바일 페이지 버튼 가시적으로 수정)
         .mode-card {
           background: var(--surface);
           border: 1px solid var(--border);
@@ -255,6 +281,7 @@ export default function Home() {
         .mode-icon { font-size: 18px; width: 24px; text-align: center; }
         .mode-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
         .mode-sub { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-dim); }
+<<<<<<< HEAD
         .mode-arrow {
           font-family: 'DM Mono', monospace;
           font-size: 14px;
@@ -263,6 +290,10 @@ export default function Home() {
         }
         .mode-card:hover .mode-arrow,
         .mode-card.selected .mode-arrow { color: var(--accent); transform: translateX(3px); }
+=======
+        .mode-arrow { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--text-dim); transition: color 0.2s, transform 0.2s; }
+        .mode-card:hover .mode-arrow, .mode-card.selected .mode-arrow { color: var(--accent); transform: translateX(3px); }
+>>>>>>> d8f6ce3 (모바일 페이지 버튼 가시적으로 수정)
 
         .start-btn {
           background: var(--accent);
@@ -278,7 +309,9 @@ export default function Home() {
           flex-shrink: 0;
         }
         .start-btn:hover { opacity: 0.85; }
+        .onboard-note { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-dim); margin-top: 16px; flex-shrink: 0; }
 
+<<<<<<< HEAD
         .onboard-note {
           font-family: 'DM Mono', monospace;
           font-size: 10px;
@@ -298,12 +331,25 @@ export default function Home() {
 
         .header {
           padding: 16px 28px 14px;
+=======
+        .chat-screen {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+          min-height: 0;
+        }
+
+        .header {
+          padding: 20px 32px 16px;
+>>>>>>> d8f6ce3 (모바일 페이지 버튼 가시적으로 수정)
           border-bottom: 1px solid var(--border);
           display: flex;
           align-items: center;
           justify-content: space-between;
           flex-shrink: 0;
         }
+<<<<<<< HEAD
 
         .header-left { display: flex; align-items: center; gap: 12px; }
 
@@ -355,11 +401,19 @@ export default function Home() {
           - overflow-y: auto → 메시지 많으면 스크롤
           - 초기엔 .chat-spacer가 빈 공간을 채워 메시지를 아래에 위치시킴
         */
+=======
+
+        /* 채팅박스: justify-content flex-end 제거 → 위에서부터 쌓임, 넘치면 스크롤 */
+>>>>>>> d8f6ce3 (모바일 페이지 버튼 가시적으로 수정)
         .chat-box {
           flex: 1 1 auto;
           overflow-y: auto;
           overflow-x: hidden;
+<<<<<<< HEAD
           padding: 28px 28px 16px;
+=======
+          padding: 24px 32px 16px;
+>>>>>>> d8f6ce3 (모바일 페이지 버튼 가시적으로 수정)
           display: flex;
           flex-direction: column;
           gap: 20px;
@@ -392,6 +446,7 @@ export default function Home() {
           white-space: pre-line;
         }
 
+<<<<<<< HEAD
         .message.ai {
           background: var(--surface);
           border: 1px solid var(--border);
@@ -419,6 +474,13 @@ export default function Home() {
           border-left: 3px solid var(--accent);
           border-radius: 2px;
         }
+=======
+        .message.ai { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); }
+        .message.user { background: var(--user-bg); border: 1px solid var(--user-border); }
+        .message.error { background: rgba(200,80,80,0.1); border: 1px solid rgba(200,80,80,0.3); border-left: 3px solid #c85050; color: #e08080; font-size: 13px; }
+
+        .loading-dots { display: flex; gap: 5px; align-items: center; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 2px; }
+>>>>>>> d8f6ce3 (모바일 페이지 버튼 가시적으로 수정)
         .dot { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; opacity: 0.4; animation: pulse 1.2s infinite; }
         .dot:nth-child(2) { animation-delay: 0.2s; }
         .dot:nth-child(3) { animation-delay: 0.4s; }
@@ -500,11 +562,27 @@ export default function Home() {
           text-align: right;
         }
 
+<<<<<<< HEAD
         @media (max-width: 600px) {
           .onboarding { padding: 36px 20px 32px; }
           .onboard-desc { font-size: 14px; }
           .header { padding: 13px 20px 11px; }
           .chat-box { padding: 20px 20px 8px; }
+=======
+        @media (max-width: 640px) {
+          .onboarding { padding: 36px 20px 32px; }
+          .onboard-logo { margin-bottom: 20px; font-size: 12px; }
+          .onboard-headline { margin-bottom: 12px; line-height: 1.25; }
+          .onboard-desc { margin-bottom: 24px; font-size: 14.5px; line-height: 1.65; }
+          .onboard-divider { height: 28px; margin: 0 auto 28px; }
+          .mode-grid { gap: 8px; margin-bottom: 28px; }
+          .mode-card { padding: 16px 20px; }
+          .start-btn { padding: 15px 56px; font-size: 13.5px; margin-top: 8px; }
+          .onboard-note { margin-top: 8px; font-size: 9.5px; }
+
+          .header { padding: 14px 20px; }
+          .chat-box { padding: 20px 20px 16px; }
+>>>>>>> d8f6ce3 (모바일 페이지 버튼 가시적으로 수정)
           .timer-zone { margin: 0 20px; }
           .input-zone { padding: 10px 20px 18px; }
           .message { max-width: 92%; font-size: 14px; }
