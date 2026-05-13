@@ -179,10 +179,10 @@ export default function Home() {
 
         @media (max-width: 640px) {
           .onboarding {
-            padding-top: 48px;
-            padding-bottom: 32px;
-          }
-        }
+            padding: 40px 20px 32px;           
+            justify-content: flex-start;       
+            gap: 24px;                        
+          } 
 
         .onboard-logo {
           font-family: 'DM Mono', monospace;
