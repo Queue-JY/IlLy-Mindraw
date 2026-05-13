@@ -245,6 +245,49 @@ export default function Home() {
           flex-shrink: 0;
         }
 
+        .header-left { display: flex; align-items: center; gap: 12px; }
+
+        .back-btn {
+          background: none;
+          border: none;
+          color: var(--text-mid);
+          font-family: 'DM Mono', monospace;
+          font-size: 12px;
+          cursor: pointer;
+          padding: 4px 0;
+          transition: color 0.2s;
+        }
+        .back-btn:hover { color: var(--accent); }
+
+        .header-divider { width: 1px; height: 16px; background: var(--border); flex-shrink: 0; }
+
+        .logo-text {
+          font-family: 'DM Mono', monospace;
+          font-size: 13px;
+          color: var(--accent);
+          letter-spacing: 0.12em;
+        }
+
+        .mode-badge {
+          font-family: 'DM Mono', monospace;
+          font-size: 10px;
+          color: var(--text-dim);
+          background: var(--surface);
+          border: 1px solid var(--border);
+          padding: 3px 10px;
+          border-radius: 2px;
+        }
+
+        .session-info {
+          font-family: 'DM Mono', monospace;
+          font-size: 10px;
+          color: var(--text-dim);
+          text-align: right;
+          line-height: 1.6;
+        }
+
+        .turn-count { color: var(--accent); }
+
         /* 채팅박스: justify-content flex-end 제거 → 위에서부터 쌓임, 넘치면 스크롤 */
         .chat-box {
           flex: 1 1 auto;
