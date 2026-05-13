@@ -41,10 +41,13 @@ export default function Home() {
   const inputRef = useRef(null);
   const timerRef = useRef(null);
 
-  // 메시지 추가될 때 자동 스크롤
+  // 새 메시지 올 때마다 최하단으로 자동 스크롤
   useEffect(() => {
     if (chatBoxRef.current) {
-      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+      chatBoxRef.current.scrollTo({
+        top: chatBoxRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
     }
   }, [messages]);
 
@@ -69,6 +72,7 @@ export default function Home() {
     setTimerCount(30);
     setIsUrgent(false);
     let count = 30;
+
     timerRef.current = setInterval(() => {
       count--;
       setTimerCount(count);
@@ -130,7 +134,7 @@ export default function Home() {
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap');
-       
+
         :root {
           --bg: #0c0c0e;
           --surface: #141416;
@@ -178,15 +182,56 @@ export default function Home() {
           padding: 40px 32px;
         }
 
-        /* ... (온보딩 스타일 생략 - 기존과 동일) ... */
+        .onboard-logo { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--accent); letter-spacing: 0.2em; margin-bottom: 48px; }
+        .onboard-headline { font-size: clamp(28px, 5vw, 42px); font-weight: 700; line-height: 1.3; letter-spacing: -1px; text-align: center; margin-bottom: 20px; }
+        .onboard-headline em { color: var(--accent); font-style: normal; }
+        .onboard-desc { font-size: 15px; color: var(--text-mid); text-align: center; line-height: 1.8; max-width: 440px; margin-bottom: 56px; }
+        .onboard-divider { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--border), transparent); margin: 0 auto 56px; }
 
-        /* ==================== 채팅 영역 ==================== */
+        .mode-grid { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 480px; margin-bottom: 40px; }
+        .mode-card {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          padding: 18px 22px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          transition: border-color 0.2s, background 0.2s;
+          border-radius: 2px;
+        }
+        .mode-card:hover { border-color: var(--accent-border); background: var(--accent-dim); }
+        .mode-card.selected { border-color: var(--accent); background: var(--accent-dim); }
+
+        .mode-left { display: flex; align-items: center; gap: 14px; }
+        .mode-icon { font-size: 18px; width: 24px; text-align: center; }
+        .mode-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+        .mode-sub { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-dim); }
+        .mode-arrow { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--text-dim); transition: color 0.2s, transform 0.2s; }
+        .mode-card:hover .mode-arrow, .mode-card.selected .mode-arrow { color: var(--accent); transform: translateX(3px); }
+
+        .start-btn {
+          background: var(--accent);
+          color: var(--bg);
+          border: none;
+          padding: 16px 48px;
+          font-family: 'DM Mono', monospace;
+          font-size: 13px;
+          letter-spacing: 0.1em;
+          cursor: pointer;
+          border-radius: 2px;
+          transition: opacity 0.2s;
+        }
+        .start-btn:hover { opacity: 0.85; }
+        .onboard-note { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-dim); margin-top: 16px; }
+
+        /* 채팅 화면 */
         .chat-screen {
           flex: 1;
           display: flex;
           flex-direction: column;
           overflow: hidden;
-          min-height: 0;           /* flex 스크롤을 위해 필수 */
+          min-height: 0;
         }
 
         .header {
@@ -206,14 +251,13 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           gap: 20px;
+          justify-content: flex-end;        /* 최신 메시지 하단 고정 */
           -webkit-overflow-scrolling: touch;
           scroll-behavior: smooth;
           overscroll-behavior: contain;
         }
 
-        .chat-box::-webkit-scrollbar {
-          display: none;
-        }
+        .chat-box::-webkit-scrollbar { display: none; }
 
         .message-wrap { display: flex; flex-direction: column; gap: 6px; }
         .message-wrap.user { align-items: flex-end; }
@@ -235,7 +279,6 @@ export default function Home() {
         .message.error { background: rgba(200,80,80,0.1); border: 1px solid rgba(200,80,80,0.3); border-left: 3px solid #c85050; color: #e08080; font-size: 13px; }
 
         .loading-dots { display: flex; gap: 5px; align-items: center; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 2px; }
-
         .dot { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; opacity: 0.4; animation: pulse 1.2s infinite; }
         .dot:nth-child(2) { animation-delay: 0.2s; }
         .dot:nth-child(3) { animation-delay: 0.4s; }
@@ -296,19 +339,14 @@ export default function Home() {
           white-space: nowrap;
           height: 50px;
         }
-
         .send-btn:hover:not(:disabled) { opacity: 0.85; }
         .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
         .hint { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-dim); margin-top: 8px; text-align: right; }
 
-        /* ==================== 모바일 최적화 ==================== */
+        /* 모바일 최적화 */
         @media (max-width: 640px) {
-          .onboarding {
-            justify-content: flex-start;
-            padding: 48px 20px 32px;
-            gap: 20px;
-          }
+          .onboarding { justify-content: flex-start; padding: 48px 20px 32px; gap: 20px; }
           .onboard-logo { margin-bottom: 20px; font-size: 12px; }
           .onboard-headline { margin-bottom: 12px; line-height: 1.25; }
           .onboard-desc { margin-bottom: 24px; font-size: 14.5px; line-height: 1.65; }
@@ -327,8 +365,43 @@ export default function Home() {
       `}</style>
 
       <div className="container">
-        {screen === 'onboarding' && ( /* 온보딩 부분은 기존 그대로 */ )}
-        
+        {screen === 'onboarding' && (
+          <div className="onboarding">
+            <div className="onboard-logo">MINDRAW</div>
+            <h1 className="onboard-headline">
+              답이 아닌 <em>질문</em>을<br />드립니다
+            </h1>
+            <p className="onboard-desc">
+              AI가 답을 주는 시대,<br />
+              Mindraw는 당신이 스스로 생각하도록<br />
+              질문을 던집니다.
+            </p>
+            <div className="onboard-divider" />
+
+            <div className="mode-grid">
+              {Object.entries(MODES).map(([key, mode]) => (
+                <div
+                  key={key}
+                  className={`mode-card ${selectedMode === key ? 'selected' : ''}`}
+                  onClick={() => setSelectedMode(key)}
+                >
+                  <div className="mode-left">
+                    <div className="mode-icon">{mode.icon}</div>
+                    <div>
+                      <div className="mode-name">{mode.name}</div>
+                      <div className="mode-sub">{mode.sub}</div>
+                    </div>
+                  </div>
+                  <div className="mode-arrow">→</div>
+                </div>
+              ))}
+            </div>
+
+            <button className="start-btn" onClick={startChat}>시작하기</button>
+            <div className="onboard-note">답을 드리지 않습니다. 생각할 준비가 되셨나요?</div>
+          </div>
+        )}
+
         {screen === 'chat' && (
           <div className="chat-screen">
             <div className="header">
@@ -386,7 +459,11 @@ export default function Home() {
                     e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
                   }}
                 />
-                <button className="send-btn" onClick={sendMessage} disabled={isLoading || timerActive}>
+                <button
+                  className="send-btn"
+                  onClick={sendMessage}
+                  disabled={isLoading || timerActive}
+                >
                   전송
                 </button>
               </div>
