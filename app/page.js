@@ -135,29 +135,36 @@ export default function Home() {
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap');
 
         :root {
-          --bg: #0c0c0e;
-          --surface: #141416;
-          --border: #2a2a30;
-          --accent: #B9B7FF;
-          --accent-dim: #9C9DFF;
-          --accent-border: #91F0D9;
-          --text: #e8e6e0;
-          --text-dim: #6b6860;
-          --text-mid: #9e9b94;
-          --user-bg: #1a1f2e;
-          --user-border: #2a3555;
+          --bg: #f7f8fc;
+          --surface: rgba(255,255,255,0.55);
+          --border: rgba(255,255,255,0.45);
+          --accent: #8f8cff;
+          --accent-dim: rgba(143,140,255,0.12);
+          --accent-border: rgba(145,240,217,0.35);
+          --text: #1d2433;
+          --text-dim: #6f7a90;
+          --text-mid: #8d96aa;
+          --user-bg: rgba(143,140,255,0.10);
+          --user-border: rgba(143,140,255,0.22);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
           font-family: 'Noto Serif KR', serif;
-          background: var(--bg);
           color: var(--text);
-          height: 100dvh;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
+          background:
+            radial-gradient(circle at 30% 30%,
+              rgba(185,183,255,0.65),
+              transparent 38%),
+            radial-gradient(circle at 70% 40%,
+              rgba(145,240,217,0.55),
+              transparent 42%),
+            radial-gradient(circle at 50% 80%,
+              rgba(120,220,255,0.45),
+              transparent 40%),
+            #f7f8fc;
+          min-height: 100vh;
           overflow: hidden;
         }
 
@@ -221,7 +228,7 @@ export default function Home() {
           font-size: 13px;
           letter-spacing: 0.1em;
           cursor: pointer;
-          border-radius: 2px;
+          border-radius: 20px;
           transition: opacity 0.2s;
           flex-shrink: 0;
         }
@@ -313,7 +320,7 @@ export default function Home() {
         .message {
           max-width: 82%;
           padding: 16px 20px;
-          border-radius: 2px;
+          border-radius: 20px;
           font-size: 15px;
           line-height: 1.75;
           white-space: pre-line;
@@ -379,7 +386,7 @@ export default function Home() {
           font-size: 12px;
           letter-spacing: 0.08em;
           cursor: pointer;
-          border-radius: 2px;
+          border-radius: 20px;
           transition: opacity 0.2s;
           white-space: nowrap;
           height: 50px;
