@@ -229,7 +229,7 @@ export default function Home() {
           font-size: 13px;
           letter-spacing: 0.1em;
           cursor: pointer;
-          border-radius: 2px;
+          border-radius: 4px;
           transition: opacity 0.2s;
           flex-shrink: 0;
         }
@@ -321,7 +321,7 @@ export default function Home() {
         .message {
           max-width: 82%;
           padding: 16px 20px;
-          border-radius: 2px;
+          border-radius: 12px;
           font-size: 15px;
           line-height: 1.75;
           white-space: pre-line;
@@ -387,7 +387,7 @@ export default function Home() {
           font-size: 12px;
           letter-spacing: 0.08em;
           cursor: pointer;
-          border-radius: 2px;
+          border-radius: 4px;
           transition: opacity 0.2s;
           white-space: nowrap;
           height: 50px;
