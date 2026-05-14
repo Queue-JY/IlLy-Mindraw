@@ -171,6 +171,7 @@ export default function Home() {
         .container {
           width: 100%;
           max-width: 720px;
+          margin: 0 auto;
           height: 100dvh;
           display: flex;
           flex-direction: column;
@@ -228,7 +229,7 @@ export default function Home() {
           font-size: 13px;
           letter-spacing: 0.1em;
           cursor: pointer;
-          border-radius: 20px;
+          border-radius: 2px;
           transition: opacity 0.2s;
           flex-shrink: 0;
         }
@@ -320,7 +321,7 @@ export default function Home() {
         .message {
           max-width: 82%;
           padding: 16px 20px;
-          border-radius: 20px;
+          border-radius: 2px;
           font-size: 15px;
           line-height: 1.75;
           white-space: pre-line;
@@ -374,7 +375,7 @@ export default function Home() {
         }
 
         textarea::placeholder { color: var(--text-dim); }
-        textarea:focus { outline: none; border-color: rgba(200,169,110,0.5); }
+        textarea:focus { outline: none; }
         textarea:disabled { opacity: 0.4; cursor: not-allowed; }
 
         .send-btn {
