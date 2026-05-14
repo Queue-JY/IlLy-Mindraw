@@ -138,9 +138,9 @@ export default function Home() {
           --bg: #0c0c0e;
           --surface: #141416;
           --border: #2a2a30;
-          --accent: #c8a96e;
-          --accent-dim: rgba(200, 169, 110, 0.12);
-          --accent-border: rgba(200, 169, 110, 0.25);
+          --accent: #B9B7FF;
+          --accent-dim: #9C9DFF;
+          --accent-border: #91F0D9;
           --text: #e8e6e0;
           --text-dim: #6b6860;
           --text-mid: #9e9b94;
