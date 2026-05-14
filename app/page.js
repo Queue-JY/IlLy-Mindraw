@@ -370,7 +370,7 @@ export default function Home() {
           resize: none;
           min-height: 50px;
           max-height: 120px;
-          border-radius: 2px;
+          border-radius: 20px;
           transition: border-color 0.2s;
         }
 
@@ -387,7 +387,7 @@ export default function Home() {
           font-size: 12px;
           letter-spacing: 0.08em;
           cursor: pointer;
-          border-radius: 20px;
+          border-radius: 2px;
           transition: opacity 0.2s;
           white-space: nowrap;
           height: 50px;
