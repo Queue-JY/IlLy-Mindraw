@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mindraw
 
-## Getting Started
+> 답이 아닌 질문을 드립니다.
 
-First, run the development server:
+Mindraw는 사용자에게 직접적인 답이나 예시를 제공하지 않고 **소크라테스식 질문법**을 통해 스스로 생각하고 답을 찾아가도록 돕는 AI 코칭 서비스입니다.
+
+## 핵심 철학
+
+대부분의 AI 도구는 빠른 답을 제공하는 데 초점을 맞춥니다. Mindraw는 반대의 길을 갑니다.
+
+- 직접적인 답변, 예시 문장, 아이디어 제안을 하지 않습니다.
+- 한 번에 하나의 질문만 던져 사용자가 스스로의 생각과 경험을 끌어내도록 돕습니다.
+- AI의 답변 후 **30초의 생각 타이머**가 활성화되어 즉각적인 재입력 대신 충분히 생각할 시간을 갖도록 유도합니다.
+
+## 주요 기능
+
+### 3가지 코칭 모드
+
+| 모드 | 설명 |
+|---|---|
+| ✍️ **글쓰기 코치** | 자소서, 보고서, 기획안 등 글쓰기 고민을 위한 질문 코칭 |
+| ⚖️ **의사결정 코치** | 선택과 판단의 순간, 우선순위와 가치관을 발견하게 하는 질문 코칭 |
+| 💡 **아이디에이션** | 발상과 기획 단계에서 잠재된 생각을 끌어내는 질문 코칭 |
+
+### 생각 타이머
+
+AI의 질문을 받은 후 30초간 입력창이 잠깁니다. 답을 받는 즉시 다시 묻는 습관 대신 스스로 곱씹어보는 시간을 의도적으로 설계했습니다. 남은 시간이 10초 이하로 줄어들면 시각적으로 강조됩니다.
+
+### 대화 세션 트래킹
+
+대화가 진행될수록 누적된 질문 횟수를 표시하여 "내 생각으로 채운 대화"가 얼마나 쌓였는지 보여줍니다.
+
+## 기술 스택
+
+- **Framework**: [Next.js](https://nextjs.org) (App Router)
+- **UI**: React (Client Components)
+- **AI Model**: Google Gemini API (`/api/chat` 라우트를 통해 호출)
+- **스타일링**: Vanilla CSS (styled via `<style>` 태그), Glassmorphism 기반 UI
+- **폰트**: Noto Serif KR, DM Mono (Google Fonts)
+
+## 시작하기
+
+### 1. 설치
+
+```bash
+npm install
+```
+
+### 2. 환경 변수 설정
+
+루트 디렉토리에 `.env.local` 파일을 생성하고 Gemini API 키를 입력합니다.
+
+```bash
+GEMINI_API_KEY=your_api_key_here
+```
+
+> `/api/chat` 라우트 핸들러에서 사용하는 환경 변수명은 실제 구현에 맞게 확인해주세요.
+
+### 3. 개발 서버 실행
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+브라우저에서 [http://localhost:3000](http://localhost:3000) 으로 접속합니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 프로젝트 구조
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+.
+├── app/
+│   ├── page.js          # 메인 화면 (온보딩 + 채팅)
+│   └── api/
+│       └── chat/        # Gemini API 연동 라우트
+├── public/               # 정적 리소스
+├── next.config.mjs
+└── package.json
+```
 
-## Learn More
+## 동작 흐름
 
-To learn more about Next.js, take a look at the following resources:
+1. **온보딩 화면**: 3가지 모드 중 하나를 선택
+2. **채팅 시작**: 모드별 시스템 프롬프트와 첫 인사 메시지 로드
+3. **사용자 입력 → AI 질문 응답**: `/api/chat`에 대화 히스토리와 모드별 system prompt를 전송
+4. **30초 타이머 활성화**: 사용자가 충분히 생각할 시간을 가진 후 다음 입력 가능
+5. 반복
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 라이선스
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+별도 라이선스가 지정되지 않은 경우 모든 권리는 프로젝트 소유자에게 있습니다.
